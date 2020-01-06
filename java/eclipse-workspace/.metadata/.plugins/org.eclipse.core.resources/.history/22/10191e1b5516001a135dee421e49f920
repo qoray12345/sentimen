@@ -1,0 +1,212 @@
+package com.ebdesk;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+//import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+
+@SpringBootApplication
+public class NrlApplication {
+
+	private BufferedReader br;
+	public static void main(String[] args) {
+		long start = System.currentTimeMillis();
+//		SpringApplication.run(NrlApplication.class, args);
+		NrlApplication a = new NrlApplication();
+//		generate singel sentiment
+//		String input = "Tak Berdaya Rakyat Jokowi Dicekik Asap Karhutla #JaeMaju62Mundur #JaeMaju62Mundur https://m.cnnindonesia.com/nasional/20190723162307-20-414796/tak-berdaya-rakyat-jokowi-dicekik-asap-karhutla …";
+//		System.out.println(a.input(input));
+//		generate many sentiment
+		a.read("txt/crawl_karhutla1.csv");
+		long end = System.currentTimeMillis();
+		long hasil = end - start;
+		System.out.println(hasil);
+		
+	}
+	public List<String> readfile(String list) {
+		List<String> res = new ArrayList<String>();
+		 File file = new File(list);
+		 try {
+			 br = new BufferedReader(new FileReader(file)); 
+			  
+			  String st; 
+			  while ((st = br.readLine()) != null) {
+			    res.add(st);
+			  }
+		} catch (Exception e) {
+			// TODO: handle exception
+		} 
+		return res;
+	}
+	public String input(String input) {
+		long start = System.currentTimeMillis();
+		NrlApplication a = new NrlApplication();
+		List<String> positif = a.readfile("txt/positif.txt");
+		List<String> negatif = a.readfile("txt/negatif.txt");
+		int intpositif = 0;
+		int intnegatif = 0;
+//		System.out.println("positif");
+		String[] inputs = input.split(" "); 
+		for(String str : positif) {
+			for(int i =0 ; i<inputs.length; i++) {
+				if(inputs[i].equals(str)) {
+					intpositif++;
+//					System.out.println(str);
+				}
+			}
+		}
+//		System.out.println("negatif");
+		for(String str : negatif) {
+			if(input.contains(str)) {
+				for(int i =0 ; i<inputs.length; i++) {
+					if(inputs[i].equals(str)) {
+						intnegatif++;
+//						System.out.println(str);
+					}
+				}
+			}
+		}
+//		System.out.println(intpositif);
+//		System.out.println(intnegatif);
+		String hasil = null;
+		if(intpositif==intnegatif) {
+			 hasil = "netral";
+		}else if (intpositif>intnegatif) {
+			hasil =  "positif";
+		}else if (intpositif < intnegatif) {
+			hasil =  "negatif";
+		}else {
+			hasil = "";
+		}
+		long end = System.currentTimeMillis();
+		@SuppressWarnings("unused")
+		long hasil1 = end - start;
+//		System.out.println(hasil1);
+		return hasil;
+	}
+	public String input1(String input) {
+		long start = System.currentTimeMillis();
+		NrlApplication a = new NrlApplication();
+		List<String> positif = a.readfile("txt/positif.txt");
+		List<String> negatif = a.readfile("txt/negatif.txt");
+		int intpositif = 0;
+		int intnegatif = 0;
+		System.out.println("positif");
+		String[] inputs = input.split(" "); 
+		for(String str : positif) {
+			for(int i =0 ; i<inputs.length; i++) {
+				if(inputs[i].equals(str)) {
+					intpositif++;
+					System.out.println(str);
+				}
+			}
+		}
+		System.out.println("negatif");
+		for(String str : negatif) {
+			if(input.contains(str)) {
+				for(int i =0 ; i<inputs.length; i++) {
+					if(inputs[i].equals(str)) {
+						intnegatif++;
+						System.out.println(str);
+					}
+				}
+			}
+		}
+		System.out.println(intpositif);
+		System.out.println(intnegatif);
+		String hasil = null;
+		if(intpositif==intnegatif) {
+			 hasil = "netral";
+		}else if (intpositif>intnegatif) {
+			hasil =  "positif";
+		}else if (intpositif < intnegatif) {
+			hasil =  "negatif";
+		}else {
+			hasil = "";
+		}
+		long end = System.currentTimeMillis();
+		@SuppressWarnings("unused")
+		long hasil1 = end - start;
+//		System.out.println(hasil1);
+		return hasil;
+	}
+	public void read(String input) {
+		try {
+			Reader reader = Files.newBufferedReader(Paths.get(input));
+			CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT);
+			List<Object> nls = new ArrayList<Object>();
+			for (CSVRecord csvRecord : csvParser) {
+				NrlApplication a = new NrlApplication();
+				HashMap<String, Object> map = new HashMap<String, Object>();
+				map.put("id", csvRecord.get(0));
+				map.put("conversation_id", csvRecord.get(1));
+				map.put("created_at", csvRecord.get(2));
+				map.put("date", csvRecord.get(3));
+				map.put("time", csvRecord.get(4));
+				map.put("timezone", csvRecord.get(5));
+				map.put("user_id", csvRecord.get(6));
+				map.put("username", csvRecord.get(7));
+				map.put("name", csvRecord.get(8));
+				map.put("place", csvRecord.get(9));
+				map.put("tweet", csvRecord.get(10));
+				map.put("mentions", csvRecord.get(11));
+				map.put("urls", csvRecord.get(12));
+				map.put("photos", csvRecord.get(13));
+				map.put("replies_count", csvRecord.get(14));
+				map.put("retweets_count", csvRecord.get(15));
+				map.put("likes_count", csvRecord.get(16));
+				map.put("hashtags", csvRecord.get(17));
+				map.put("link", csvRecord.get(18));
+				map.put("retweet", csvRecord.get(19));
+				map.put("quote_url", csvRecord.get(20));
+				map.put("video", csvRecord.get(21));
+				map.put("near", csvRecord.get(22));
+				map.put("geo", csvRecord.get(23));
+				map.put("source", csvRecord.get(24));
+				map.put("user_rt_id", csvRecord.get(25));
+				map.put("user_rt", csvRecord.get(26));
+				map.put("retweet_id", csvRecord.get(27));
+				map.put("near", csvRecord.get(28));
+				map.put("reply_to", csvRecord.get(29));
+				map.put("retweet_date", csvRecord.get(30));
+//				map.put("sentimen",csvRecord.)
+				map.put("sentimen", a.input(csvRecord.get(10)));
+				nls.add(map);
+			}
+			ObjectMapper om = new ObjectMapper();
+			JsonNode data = om.valueToTree(nls);
+//			System.out.println(data);
+			com.fasterxml.jackson.dataformat.csv.CsvSchema.Builder csvSchemaBuilder = CsvSchema.builder();
+			JsonNode post_follower = data.elements().next();
+			post_follower.fieldNames().forEachRemaining(fieldName -> {
+				csvSchemaBuilder.addColumn(fieldName);
+			});
+			CsvSchema csvSchema = csvSchemaBuilder.build().withHeader();
+			CsvMapper csvMapper = new CsvMapper();
+			csvMapper.writerFor(JsonNode.class).with(csvSchema).writeValue(new File("txt/hasil.csv"), data);
+			
+			csvParser.close();
+			System.out.println("selesai");
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println(e);
+			System.out.println("error");
+		}
+	}
+}

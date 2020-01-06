@@ -1,0 +1,71 @@
+package org.nurul.utils;
+
+import com.google.common.base.Joiner;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+
+public class RakeService {
+	private static Map<String, List<String>> list = new HashMap<>();
+	private static Map<String, String> list_join = new HashMap<>();
+
+	public RakeService() throws IOException {
+		loadAll();
+	}
+
+
+
+	private void loadAll() throws IOException {
+    	String dir = "E:\\data\\rake";
+
+    	load("cleansing_id", dir + "/cleansing_keyword_id.txt");
+		load("cleansing_my", dir + "/cleansing_keyword_my.txt");
+		load("cleansing_en", dir + "/cleansing_keyword_en.txt");
+		load("stopword_en", dir + "/en_stopword.txt");
+		load("stopword_my", dir + "/my_stopword.txt");
+		load("stopword_id", dir + "/indonesian_stopword.txt");
+		load("keyword_statement", dir + "/keyword_statement.txt");
+		load("title", dir + "/title.txt");
+
+	}
+
+	private void load(String string, String string2) throws IOException {
+		List<String> words = Files.readAllLines(Paths.get(string2)).stream().map(String::toLowerCase)
+				.collect(Collectors.toList());
+		setKeys(string, words);
+	}
+
+
+	private static void setKeys(String key, List<String> words) {
+		if (key.equals("stopword_en")) {
+			List<String> en = Arrays.asList(words.get(0).split(","));
+			list.put(key, en);
+			list_join.put(key, Joiner.on("|").join(en));
+		} else {
+			list.put(key, words);
+			list_join.put(key, Joiner.on("|").join(words));
+		}
+	}
+	public static List<String> get(String key) {
+		return list.get(key);
+	}
+	public static String getJoin(String key) {
+		return list_join.get(key);
+	}
+	public String cleanText(String content, String lang) {
+		return new Cleansing(content, lang).normalize_non_ascii().clean_html_tag().preprocess_content().clean_tweet()
+				.replace_stopwords().replace_keyword_statement().replace_title().replace_punctuations()
+				.replace_numeric().get();
+	}
+
+
+}

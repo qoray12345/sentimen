@@ -1,0 +1,10 @@
+<html>
+<body>
+
+<form action="" method="post">
+	Input Sentimen: <input type="text" name="name"><br>
+<input type="submit">
+</form>
+
+</body>
+</html>
